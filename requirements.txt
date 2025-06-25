@@ -1,3 +1,4 @@
 telethon
 python-dotenv
 google-generativeai
+aiocron

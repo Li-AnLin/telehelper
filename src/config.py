@@ -22,8 +22,9 @@ IGNORE_GROUPS = [
 PRIVATE_MESSAGE_KEYWORDS = ['幫我', '請你', '麻煩', '記得', '請問', '能不能', '可不可以', '有沒有', '有空', '有時間']
 
 # --- Scheduler Settings ---
-# Time to send daily summary (HH:MM)
-SUMMARY_TIME = "09:00"
+# Time to send daily summary (HH:MM) - DEPRECATED, use DAILY_SUMMARY_CRON
+# SUMMARY_TIME = "09:00"
+DAILY_SUMMARY_CRON = os.getenv("DAILY_SUMMARY_CRON", "0 9 * * *") # default to 09:00 daily
 
 # --- Notifier Bot Settings ---
 # Bot token for sending notifications from @BotFather

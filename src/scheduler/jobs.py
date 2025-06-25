@@ -4,6 +4,8 @@ from telethon import TelegramClient
 from src.context import database
 from src.bot import notifier
 from typing import Optional
+import aiocron
+from src import config
 
 async def send_daily_summary(user_client: TelegramClient, bot_client: Optional[TelegramClient]):
     """Fetches pending tasks and sends a summary to the user via the notifier bot."""
@@ -42,10 +44,17 @@ async def send_daily_summary(user_client: TelegramClient, bot_client: Optional[T
         print(f"🚨 ERROR in send_daily_summary: {e}")
 
 async def run_scheduler(user_client: TelegramClient, bot_client: Optional[TelegramClient]):
-    """Runs the daily summary job at a fixed time every day."""
-    # This is a simple scheduler. For production, consider a more robust library.
-    while True:
-        # For demonstration, this runs every 2 minutes.
-        # For daily, use: await asyncio.sleep(24 * 60 * 60)
-        await asyncio.sleep(120) 
-        await send_daily_summary(user_client, bot_client) 
+    """Runs the daily summary job at a fixed time every day using cron format."""
+    print(f"Scheduling daily summary with cron: {config.DAILY_SUMMARY_CRON}")
+    
+    # Schedule the daily summary task using aiocron
+    # The function needs to be a partial to pass arguments to it
+    daily_summary_task = aiocron.crontab(
+        config.DAILY_SUMMARY_CRON,
+        func=send_daily_summary,
+        args=(user_client, bot_client),
+        start=True, # Start the cron job immediately
+        loop=asyncio.get_running_loop() # Ensure it runs on the current loop
+    )
+    print("Scheduler started. Waiting for cron job to trigger...")
+    # The scheduler runs indefinitely in the background, so no need for a while True loop here 
