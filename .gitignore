@@ -3,6 +3,6 @@
 *.session
 *.session-journal
 
-**/__pycache__
+__pycache__/
 
 *.db
