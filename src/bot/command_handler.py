@@ -40,7 +40,7 @@ async def handle_bot_command(event: events.NewMessage.Event):
             for i, task in enumerate(pending_tasks, 1):
                 # For commands, we don't have access to the main client for chat titles
                 # So we'll display chat_id for now, or you can enhance this with chat caching
-                chat_info = f"對話 ID: {task['chat_id']}"
+                chat_info = f"來自: {task['sender']}"
 
                 # Use status to assign an icon
                 status_icon = "🔴" if task['status'] == 'new' else "🟡"

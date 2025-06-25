@@ -33,5 +33,8 @@ NOTIFIER_BOT_TOKEN = os.getenv("NOTIFIER_BOT_TOKEN", "")
 # You can get this from a bot like @userinfobot
 NOTIFIER_TARGET_CHAT_ID = int(os.getenv("NOTIFIER_TARGET_CHAT_ID", 0))
 
+# --- User Settings ---
+TELEGRAM_USER_NAME = os.getenv("TELEGRAM_USER_NAME", "主人")
+
 # --- Database ---
 DB_NAME = "tasks.db" 

@@ -25,7 +25,7 @@ async def is_tagged(event, me: User):
         return True
     
     # Check for replies to our messages
-    if await event.is_reply:
+    if event.is_reply:
         reply_msg = await event.get_reply_message()
         if reply_msg and getattr(reply_msg.from_id, 'user_id', None) == me.id:
             return True
@@ -77,6 +77,11 @@ async def handle_message(event: events.NewMessage.Event, client: TelegramClient)
         return
 
     sender = await event.get_sender()
+    # Ignore messages from bots
+    if getattr(sender, 'bot', False):
+        print(f"Ignoring message from bot: {getattr(sender, 'username', '未知')}")
+        return
+
     sender_name = get_sender_name(sender)
     
     should_process = False

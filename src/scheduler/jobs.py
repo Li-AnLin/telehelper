@@ -15,9 +15,9 @@ async def send_daily_summary(user_client: TelegramClient, bot_client: Optional[T
 
         message_content = ""
         if not pending_tasks:
-            message_content = "🎉 Power，你今天沒有未處理事項，做得很好！"
+            message_content = f"🎉 {config.TELEGRAM_USER_NAME}，你今天沒有未處理事項，做得很好！"
         else:
-            message_content = f"👋 Power，你今天還有 {len(pending_tasks)} 件未處理事項：\n\n"
+            message_content = f"👋 {config.TELEGRAM_USER_NAME}，你今天還有 {len(pending_tasks)} 件未處理事項：\n\n"
             for i, task in enumerate(pending_tasks, 1):
                 # Try to get chat title for context using the main client
                 try:
