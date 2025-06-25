@@ -14,12 +14,18 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 # --- Bot Settings ---
 # List of group IDs, titles, or usernames to ignore
-IGNORE_GROUPS = [
-    1903761391,
-]
-
-# Keywords to trigger task detection in private messages
-PRIVATE_MESSAGE_KEYWORDS = ['幫我', '請你', '麻煩', '記得', '請問', '能不能', '可不可以', '有沒有', '有空', '有時間']
+IGNORE_GROUPS_STR = os.getenv("IGNORE_GROUPS", "")
+IGNORE_GROUPS = []
+if IGNORE_GROUPS_STR:
+    # Split by comma and strip whitespace
+    temp_groups = [item.strip() for item in IGNORE_GROUPS_STR.split(",") if item.strip()]
+    # Convert numeric strings to integers for group IDs
+    for item in temp_groups:
+        try:
+            IGNORE_GROUPS.append(int(item))
+        except ValueError:
+            # Keep as string if it's not a number (username or title)
+            IGNORE_GROUPS.append(item)
 
 # --- Scheduler Settings ---
 # Time to send daily summary (HH:MM) - DEPRECATED, use DAILY_SUMMARY_CRON

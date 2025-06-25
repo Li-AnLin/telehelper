@@ -32,16 +32,12 @@ async def is_tagged(event, me: User):
 
     return False
 
-def filter_keywords(text: str):
-    """Checks for keywords in private messages to decide if it's worth checking with LLM."""
-    return any(kw in text.lower() for kw in config.PRIVATE_MESSAGE_KEYWORDS)
-
 def get_sender_name(sender):
     """Extracts a display name from the sender object."""
     if not sender:
         return "未知"
     if isinstance(sender, User):
-        return sender.username or sender.first_name or "未知"
+        return sender.first_name or sender.username or "未知"
     return "未知"
 
 async def create_task_from_event(event, sender_name: str):
@@ -72,6 +68,12 @@ async def handle_message(event: events.NewMessage.Event, client: TelegramClient)
     if is_ignored_group(event, chat):
         return
 
+    # Check if the chat is muted
+    notify_settings = getattr(chat, 'notify_settings', None)
+    if notify_settings and getattr(notify_settings, 'silent', False):
+        print(f"Ignoring message from muted chat: {getattr(chat, 'title', '未知')}")
+        return
+
     text = event.message.message or ""
     if not text:
         return
@@ -86,10 +88,9 @@ async def handle_message(event: events.NewMessage.Event, client: TelegramClient)
     
     should_process = False
     if event.is_private:
-        # For private chats, check for keywords or let LLM decide
-        if filter_keywords(text):
-            if await llm_client.is_task(text):
-                should_process = True
+        # For private chats, check with LLM
+        if await llm_client.is_task(text):
+            should_process = True
     elif await is_tagged(event, me):
         # For groups, only process if mentioned
         should_process = True
