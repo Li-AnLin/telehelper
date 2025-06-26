@@ -37,7 +37,7 @@ def get_sender_name(sender):
     if not sender:
         return "未知"
     if isinstance(sender, User):
-        return sender.first_name or sender.username or "未知"
+        return sender.first_name or sender.last_name or sender.username or "未知"
     return "未知"
 
 async def create_task_from_event(event, sender_name: str):
@@ -49,6 +49,7 @@ async def create_task_from_event(event, sender_name: str):
         'sender': sender_name,
         'content': event.message.message,
         'detected_at': datetime.datetime.now().isoformat(),
+        'completed_at': None,
         'status': 'new',
         'tags': []
     }
@@ -82,6 +83,10 @@ async def handle_message(event: events.NewMessage.Event, client: TelegramClient)
     # Ignore messages from bots
     if getattr(sender, 'bot', False):
         print(f"Ignoring message from bot: {getattr(sender, 'username', '未知')}")
+        return
+    # Ignore messages sent by myself
+    if getattr(sender, 'id', None) == getattr(me, 'id', None):
+        print("Ignoring message sent by myself.")
         return
 
     sender_name = get_sender_name(sender)

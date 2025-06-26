@@ -95,7 +95,7 @@ async def handle_bot_command(event: events.NewMessage.Event):
 
             for i, task in enumerate(completed_tasks, 1):
                 chat_info = f"對話 ID: {task['chat_id']}"
-                message += f"{i}. (ID: {task['id']}) [{chat_info}] {task['content'][:50]}... (於 {task['detected_at'].split('T')[0]} 完成)\n"
+                message += f"{i}. (ID: {task['id']}) [{chat_info}] {task['content'][:50]}... (於 {task['completed_at'].split('T')[0]} 完成)\n"
             
             await event.reply(message, parse_mode='md')
             print(f"Sent completed tasks list with {len(completed_tasks)} tasks.")

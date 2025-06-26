@@ -21,6 +21,7 @@ def init_db():
             sender TEXT,
             content TEXT NOT NULL,
             detected_at TEXT NOT NULL,
+            completed_at TEXT,
             status TEXT NOT NULL,
             tags TEXT
         )
@@ -34,8 +35,8 @@ async def add_task(task_data: dict):
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        INSERT INTO tasks (source, chat_id, message_id, sender, content, detected_at, status, tags)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO tasks (source, chat_id, message_id, sender, content, detected_at, completed_at, status, tags)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         task_data.get('source', 'telegram'),
         task_data.get('chat_id'),
@@ -43,6 +44,7 @@ async def add_task(task_data: dict):
         task_data.get('sender'),
         task_data.get('content'),
         task_data.get('detected_at', datetime.datetime.now().isoformat()),
+        task_data.get('completed_at', None),
         task_data.get('status', 'new'),
         ",".join(task_data.get('tags', []))
     ))
@@ -63,7 +65,7 @@ async def update_task_status(task_id: int, status: str):
     """Updates the status of a specific task."""
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("UPDATE tasks SET status = ? WHERE id = ?", (status, task_id))
+    cursor.execute("UPDATE tasks SET status = ?, completed_at = ? WHERE id = ?", (status, datetime.datetime.now().isoformat(), task_id))
     conn.commit()
     conn.close()
     print(f"Task {task_id} status updated to {status}")
@@ -76,10 +78,10 @@ async def get_completed_tasks(from_date: Optional[str] = None, to_date: Optional
     params = []
 
     if from_date:
-        query += " AND detected_at >= ?"
+        query += " AND completed_at >= ?"
         params.append(from_date)
     if to_date:
-        query += " AND detected_at <= ?"
+        query += " AND completed_at <= ?"
         params.append(to_date)
     
     cursor.execute(query, params)
