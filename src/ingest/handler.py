@@ -76,8 +76,19 @@ async def handle_message(event: events.NewMessage.Event, client: TelegramClient)
         return
 
     text = event.message.message or ""
-    if not text:
+    # 過濾自己罐頭訊息被 forward 的情境
+    canned_reply = "好的，我已經將這則訊息記錄到待辦事項中了。"
+    # 1. 如果訊息內容等於罐頭訊息，直接忽略
+    if text.strip() == canned_reply:
+        print("Ignoring canned reply message.")
         return
+    # 2. 如果是 forward 且原 sender_id 是自己
+    if getattr(event.message, 'forward', None):
+        forward_sender_id = getattr(getattr(event.message.forward, 'sender', None), 'id', None) or \
+                            getattr(event.message.forward, 'sender_id', None)
+        if forward_sender_id == getattr(me, 'id', None):
+            print("Ignoring forwarded canned reply from myself.")
+            return
 
     sender = await event.get_sender()
     # Ignore messages from bots
