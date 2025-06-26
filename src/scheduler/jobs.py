@@ -1,13 +1,13 @@
 import asyncio
 import datetime
 from telethon import TelegramClient
+from telegram import Bot
 from src.context import database
-from src.bot import notifier
 from typing import Optional
 import aiocron
 from src import config
 
-async def send_daily_summary(user_client: TelegramClient, bot_client: Optional[TelegramClient]):
+async def send_daily_summary(user_client: TelegramClient, bot: Optional[Bot]):
     """Fetches pending tasks and sends a summary to the user via the notifier bot."""
     print("Running daily summary job...")
     try:
@@ -28,12 +28,17 @@ async def send_daily_summary(user_client: TelegramClient, bot_client: Optional[T
                 
                 # Use status to assign an icon
                 status_icon = "🔴" if task['status'] == 'new' else "🟡"
-                message_content += f"{i}. {status_icon} **[{chat_title}]** {task['content'][:50]}...\n"
+                # Note: Markdown for PTB is slightly different, using `*bold*` instead of `**bold**`
+                message_content += f"{i}. {status_icon} *[{chat_title}]* {task['content'][:50]}...\n"
             
             message_content += "\n你可以直接回覆此訊息 `/done <任務編號>` 來標記完成。"
         
-        if bot_client: # Only send via bot if bot_client is available
-            await notifier.send_notification(bot_client, message_content)
+        if bot: # Only send via bot if bot_client is available
+            await bot.send_message(
+                chat_id=config.NOTIFIER_TARGET_CHAT_ID,
+                text=message_content,
+                parse_mode='Markdown'
+            )
             print(f"Sent daily summary with {len(pending_tasks)} tasks via bot.")
         else:
             print("Notifier bot not available. Printing summary to console:")
@@ -43,7 +48,7 @@ async def send_daily_summary(user_client: TelegramClient, bot_client: Optional[T
     except Exception as e:
         print(f"🚨 ERROR in send_daily_summary: {e}")
 
-async def run_scheduler(user_client: TelegramClient, bot_client: Optional[TelegramClient]):
+async def run_scheduler(user_client: TelegramClient, bot: Optional[Bot]):
     """Runs the daily summary job at a fixed time every day using cron format."""
     print(f"Scheduling daily summary with cron: {config.DAILY_SUMMARY_CRON}")
     
@@ -52,7 +57,7 @@ async def run_scheduler(user_client: TelegramClient, bot_client: Optional[Telegr
     daily_summary_task = aiocron.crontab(
         config.DAILY_SUMMARY_CRON,
         func=send_daily_summary,
-        args=(user_client, bot_client),
+        args=(user_client, bot),
         start=True, # Start the cron job immediately
         loop=asyncio.get_running_loop() # Ensure it runs on the current loop
     )

@@ -1,8 +1,9 @@
 import yaml
-import logging
+import os
+from dotenv import load_dotenv
 
-# Setup basic logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# Load environment variables from .env file first
+load_dotenv()
 
 # Load config from YAML file
 try:
@@ -11,10 +12,10 @@ try:
         if config is None:
             config = {}
 except FileNotFoundError:
-    logging.error("❌ config.yaml not found. Please copy config.yaml.example to config.yaml and fill in your details.")
+    print("❌ config.yaml not found. Please copy config.yaml.example to config.yaml and fill in your details.")
     config = {} # Create an empty config dict to avoid crashes below
 except yaml.YAMLError as e:
-    logging.error(f"❌ Error parsing config.yaml: {e}")
+    print(f"❌ Error parsing config.yaml: {e}")
     config = {}
 
 # --- Telegram API ---
@@ -47,10 +48,19 @@ DB_NAME = database_config.get("name", "tasks.db")
 
 # --- Perform some checks for critical settings ---
 if not APP_ID or not APP_HASH or APP_HASH == "your_app_hash":
-    logging.warning("⚠️ Telegram App ID/Hash is not configured correctly in config.yaml.")
+    print("⚠️ Telegram App ID/Hash is not configured correctly in config.yaml.")
 
 if not GEMINI_API_KEY or GEMINI_API_KEY == "your_gemini_api_key":
-    logging.warning("⚠️ Gemini API Key is not configured in config.yaml.")
+    print("⚠️ Gemini API Key is not configured in config.yaml.")
 
 if not NOTIFIER_BOT_TOKEN or not NOTIFIER_TARGET_CHAT_ID or NOTIFIER_BOT_TOKEN == "your_notifier_bot_token":
-    logging.warning("⚠️ Notifier Bot Token/Target Chat ID is not configured correctly in config.yaml.") 
+    print("⚠️ Notifier Bot Token/Target Chat ID is not configured correctly in config.yaml.")
+
+# --- Session Strings (for Docker/non-interactive environments) ---
+# Read from environment variables. If not set, they will be None.
+USER_SESSION_STRING = os.environ.get("USER_SESSION_STRING")
+
+if USER_SESSION_STRING:
+    print("✅ User session string found in environment variables.")
+else:
+    print("ℹ️ User session string not found in environment variables. Will use 'user_session.session' file.") 
