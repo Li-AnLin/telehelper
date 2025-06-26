@@ -81,17 +81,10 @@ async def handle_message(event: events.NewMessage.Event, client: TelegramClient)
     if is_ignored_group(event, chat):
         return
 
-    # Check if the chat is muted
-    notify_settings = getattr(chat, 'notify_settings', None)
-    if notify_settings and getattr(notify_settings, 'silent', False):
-        print(f"Ignoring message from muted chat: {getattr(chat, 'title', '未知')}")
-        return
-
     text = event.message.message or ""
     # Filter my message being forwarded
-    canned_reply = "收到，我已經將這則訊息記錄到待辦事項中了。"
     # 1. if the message content is the canned reply, ignore it
-    if text.strip() == canned_reply:
+    if text.strip() == config.TASK_ADDED_REPLY:
         print("Ignoring canned reply message.")
         return
     # 2. if the message is forwarded and the original sender_id is myself
@@ -128,4 +121,4 @@ async def handle_message(event: events.NewMessage.Event, client: TelegramClient)
         print(f"Detected potential task from {sender_name} in chat {event.chat_id}.")
         await create_task_from_event(event, sender_name)
         # Optionally, send a confirmation reply
-        await event.reply("收到，我已經將這則訊息記錄到待辦事項中了。") 
+        await event.reply(config.TASK_ADDED_REPLY) 

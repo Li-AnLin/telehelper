@@ -1,3 +1,7 @@
+# private config
+config.yaml
+
+# old env file
 .env
 
 *.session

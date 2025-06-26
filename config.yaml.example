@@ -1,0 +1,37 @@
+# Please copy this file to config.yaml and fill in your personal settings
+# Telegram API settings
+telegram_api:
+  app_id: 1234567 # your App ID
+  app_hash: "your_app_hash" # your App Hash
+
+# Gemini API key
+gemini_api:
+  api_key: "your_gemini_api_key"
+
+# Bot settings
+bot_settings:
+  # Group IDs, titles, or usernames to ignore
+  ignore_groups:
+    - -1001234567890 # example group ID
+    - "some_group_username" # example group username
+    - "Some Group Title" # example group title
+  telegram_user_name: Boss # how you want the bot to address you
+  # Message to reply when a task is added
+  task_added_reply: Note it.
+
+# Scheduler settings
+scheduler:
+  # CRON expression for daily summary, default is 9:00 AM daily
+  daily_summary_cron: "0 9 * * *"
+
+# Notifier bot settings
+notifier:
+  # Notifier bot token from @BotFather
+  bot_token: "your_notifier_bot_token"
+  # Your personal chat ID to receive notifications
+  target_chat_id: 123456789
+
+# Database settings
+database:
+  # Database file name
+  name: "tasks.db" 

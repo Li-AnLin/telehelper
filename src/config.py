@@ -1,45 +1,56 @@
-import os
-from dotenv import load_dotenv
+import yaml
+import logging
 
-# Load environment variables from .env file
-load_dotenv()
+# Setup basic logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Load config from YAML file
+try:
+    with open("config.yaml", "r", encoding="utf-8") as f:
+        config = yaml.safe_load(f)
+        if config is None:
+            config = {}
+except FileNotFoundError:
+    logging.error("❌ config.yaml not found. Please copy config.yaml.example to config.yaml and fill in your details.")
+    config = {} # Create an empty config dict to avoid crashes below
+except yaml.YAMLError as e:
+    logging.error(f"❌ Error parsing config.yaml: {e}")
+    config = {}
 
 # --- Telegram API ---
-APP_ID = int(os.getenv("APP_ID", 0))
-APP_HASH = os.getenv("APP_HASH", "")
+telegram_config = config.get("telegram_api", {})
+APP_ID = telegram_config.get("app_id", 0)
+APP_HASH = telegram_config.get("app_hash", "")
 
 # --- Gemini API ---
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+gemini_config = config.get("gemini_api", {})
+GEMINI_API_KEY = gemini_config.get("api_key", "")
 
 # --- Bot Settings ---
-# List of group IDs, titles, or usernames to ignore
-IGNORE_GROUPS_STR = os.getenv("IGNORE_GROUPS", "")
-IGNORE_GROUPS = []
-if IGNORE_GROUPS_STR:
-    # Split by comma and strip whitespace
-    temp_groups = [item.strip() for item in IGNORE_GROUPS_STR.split(",") if item.strip()]
-    # Convert numeric strings to integers for group IDs
-    for item in temp_groups:
-        try:
-            IGNORE_GROUPS.append(int(item))
-        except ValueError:
-            # Keep as string if it's not a number (username or title)
-            IGNORE_GROUPS.append(item)
+bot_settings_config = config.get("bot_settings", {})
+IGNORE_GROUPS = bot_settings_config.get("ignore_groups", [])
+TELEGRAM_USER_NAME = bot_settings_config.get("telegram_user_name", "Boss")
+TASK_ADDED_REPLY = bot_settings_config.get("task_added_reply", "Note it.")
 
 # --- Scheduler Settings ---
-# Time to send daily summary (HH:MM) - DEPRECATED, use DAILY_SUMMARY_CRON
-# SUMMARY_TIME = "09:00"
-DAILY_SUMMARY_CRON = os.getenv("DAILY_SUMMARY_CRON", "0 9 * * *") # default to 09:00 daily
+scheduler_config = config.get("scheduler", {})
+DAILY_SUMMARY_CRON = scheduler_config.get("daily_summary_cron", "0 9 * * *")
 
 # --- Notifier Bot Settings ---
-# Bot token for sending notifications from @BotFather
-NOTIFIER_BOT_TOKEN = os.getenv("NOTIFIER_BOT_TOKEN", "")
-# Your personal chat ID to receive notifications
-# You can get this from a bot like @userinfobot
-NOTIFIER_TARGET_CHAT_ID = int(os.getenv("NOTIFIER_TARGET_CHAT_ID", 0))
-
-# --- User Settings ---
-TELEGRAM_USER_NAME = os.getenv("TELEGRAM_USER_NAME", "主人")
+notifier_config = config.get("notifier", {})
+NOTIFIER_BOT_TOKEN = notifier_config.get("bot_token", "")
+NOTIFIER_TARGET_CHAT_ID = notifier_config.get("target_chat_id", 0)
 
 # --- Database ---
-DB_NAME = "tasks.db" 
+database_config = config.get("database", {})
+DB_NAME = database_config.get("name", "tasks.db")
+
+# --- Perform some checks for critical settings ---
+if not APP_ID or not APP_HASH or APP_HASH == "your_app_hash":
+    logging.warning("⚠️ Telegram App ID/Hash is not configured correctly in config.yaml.")
+
+if not GEMINI_API_KEY or GEMINI_API_KEY == "your_gemini_api_key":
+    logging.warning("⚠️ Gemini API Key is not configured in config.yaml.")
+
+if not NOTIFIER_BOT_TOKEN or not NOTIFIER_TARGET_CHAT_ID or NOTIFIER_BOT_TOKEN == "your_notifier_bot_token":
+    logging.warning("⚠️ Notifier Bot Token/Target Chat ID is not configured correctly in config.yaml.") 
