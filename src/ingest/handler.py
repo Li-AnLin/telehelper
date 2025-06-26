@@ -26,9 +26,21 @@ async def is_tagged(event, me: User):
     
     # Check for replies to our messages
     if event.is_reply:
-        reply_msg = await event.get_reply_message()
-        if reply_msg and getattr(reply_msg.from_id, 'user_id', None) == me.id:
-            return True
+        # In topics, a message can be a reply to the topic starter (which we ignore) 
+        # or a direct reply to a specific message.
+        # A direct reply in a topic has reply_to_msg_id != reply_to_top_id.
+        # A normal chat reply has reply_to_top_id = None.
+        is_topic_direct_reply = (
+            event.message.reply_to and
+            event.message.reply_to.reply_to_top_id and
+            event.message.reply_to.reply_to_msg_id != event.message.reply_to.reply_to_top_id
+        )
+        is_normal_chat_reply = event.message.reply_to and not event.message.reply_to.reply_to_top_id
+
+        if is_topic_direct_reply or is_normal_chat_reply:
+            reply_msg = await event.get_reply_message()
+            if reply_msg and getattr(reply_msg.from_id, 'user_id', None) == me.id:
+                return True
 
     return False
 
