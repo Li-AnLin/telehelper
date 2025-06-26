@@ -7,7 +7,6 @@ load_dotenv()
 # --- Telegram API ---
 APP_ID = int(os.getenv("APP_ID", 0))
 APP_HASH = os.getenv("APP_HASH", "")
-APP_TITLE = os.getenv("APP_TITLE", "TeleHelper")
 
 # --- Gemini API ---
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")

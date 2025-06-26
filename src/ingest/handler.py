@@ -47,10 +47,10 @@ async def is_tagged(event, me: User):
 def get_sender_name(sender):
     """Extracts a display name from the sender object."""
     if not sender:
-        return "未知"
+        return "Unknown"
     if isinstance(sender, User):
-        return sender.first_name or sender.last_name or sender.username or "未知"
-    return "未知"
+        return sender.first_name or sender.last_name or sender.username or "Unknown"
+    return "Unknown"
 
 async def create_task_from_event(event, sender_name: str):
     """Creates a task dictionary from a message event."""
@@ -105,7 +105,7 @@ async def handle_message(event: events.NewMessage.Event, client: TelegramClient)
     sender = await event.get_sender()
     # Ignore messages from bots
     if getattr(sender, 'bot', False):
-        print(f"Ignoring message from bot: {getattr(sender, 'username', '未知')}")
+        print(f"Ignoring message from bot: {getattr(sender, 'username', 'Unknown')}")
         return
     # Ignore messages sent by myself
     if getattr(sender, 'id', None) == getattr(me, 'id', None):

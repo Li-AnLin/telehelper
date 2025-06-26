@@ -17,7 +17,7 @@ async def main():
 
     # 2. Initialize Clients
     user_client = TelegramClient(
-        config.APP_TITLE,
+        'user_session',
         config.APP_ID,
         config.APP_HASH
     )
@@ -44,7 +44,7 @@ async def main():
     # 4. Start clients and run concurrently
     try:
         await user_client.start() # type: ignore
-        print(f"🚀 {config.APP_TITLE} (User) is running...")
+        print(f"🚀 Copilot User is running...")
 
         # Create a list of tasks to run concurrently
         tasks = [asyncio.create_task(user_client.run_until_disconnected())] # type: ignore
