@@ -77,7 +77,7 @@ async def handle_message(event: events.NewMessage.Event, client: TelegramClient)
 
     text = event.message.message or ""
     # 過濾自己罐頭訊息被 forward 的情境
-    canned_reply = "好的，我已經將這則訊息記錄到待辦事項中了。"
+    canned_reply = "收到，我已經將這則訊息記錄到待辦事項中了。"
     # 1. 如果訊息內容等於罐頭訊息，直接忽略
     if text.strip() == canned_reply:
         print("Ignoring canned reply message.")
@@ -115,4 +115,4 @@ async def handle_message(event: events.NewMessage.Event, client: TelegramClient)
         print(f"Detected potential task from {sender_name} in chat {event.chat_id}.")
         await create_task_from_event(event, sender_name)
         # Optionally, send a confirmation reply
-        await event.reply("好的，我已經將這則訊息記錄到待辦事項中了。") 
+        await event.reply("收到，我已經將這則訊息記錄到待辦事項中了。") 
