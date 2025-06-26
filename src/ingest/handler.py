@@ -76,13 +76,13 @@ async def handle_message(event: events.NewMessage.Event, client: TelegramClient)
         return
 
     text = event.message.message or ""
-    # 過濾自己罐頭訊息被 forward 的情境
+    # Filter my message being forwarded
     canned_reply = "收到，我已經將這則訊息記錄到待辦事項中了。"
-    # 1. 如果訊息內容等於罐頭訊息，直接忽略
+    # 1. if the message content is the canned reply, ignore it
     if text.strip() == canned_reply:
         print("Ignoring canned reply message.")
         return
-    # 2. 如果是 forward 且原 sender_id 是自己
+    # 2. if the message is forwarded and the original sender_id is myself
     if getattr(event.message, 'forward', None):
         forward_sender_id = getattr(getattr(event.message.forward, 'sender', None), 'id', None) or \
                             getattr(event.message.forward, 'sender_id', None)
@@ -109,7 +109,8 @@ async def handle_message(event: events.NewMessage.Event, client: TelegramClient)
             should_process = True
     elif await is_tagged(event, me):
         # For groups, only process if mentioned
-        should_process = True
+        if await llm_client.is_task(text):
+            should_process = True
 
     if should_process:
         print(f"Detected potential task from {sender_name} in chat {event.chat_id}.")

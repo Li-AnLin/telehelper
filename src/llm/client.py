@@ -24,12 +24,41 @@ async def is_task(text: str) -> bool:
         return False
 
     try:
-        # Simple prompt to check for task-like intent
+        # More specific prompt to avoid misinterpreting commands and code blocks
         prompt = f"""
-        Analyze the following text and determine if it represents a task, a to-do item, a question that needs an answer, or a request for action.
-        Respond with only "true" if it is a task, and "false" if it is not.
+        Analyze the text to determine if it's a task. A task is a to-do item, a question needing an answer, or a request for action.
+        - A command starting with "/" is NOT a task.
+        - A simple statement or conversation is NOT a task.
+        - A block of code is NOT a task.
+        - A report, summary, or log entry is NOT a task.
+        
+        Respond with only "true" or "false".
 
-        Text: "{text}"
+        Example 1:
+        Text: "Remember to buy milk tomorrow"
+        Response: "true"
+
+        Example 2:
+        Text: "/add_task buy milk"
+        Response: "false"
+
+        Example 3:
+        Text: "What is the capital of France?"
+        Response: "true"
+        
+        Example 4:
+        Text: "hello how are you"
+        Response: "false"
+
+        Example 5:
+        Text: "```python\\nprint('hello world')\\n```"
+        Response: "false"
+
+        Example 6:
+        Text: "06/25 Report"
+        Response: "false"
+
+        Text to analyze: "{text}"
         """
         response = await model.generate_content_async(prompt)
         
