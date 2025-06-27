@@ -38,10 +38,11 @@ async def main():
         bot_app.add_handler(MessageHandler(filters.COMMAND, command_handler.unknown_command))
     else:
         print("⚠️ Notifier bot token not set, command handling will be disabled.")
+        return
 
 
     # 4. Register Event Handlers for User Client
-    user_handler = functools.partial(handle_message, client=user_client)
+    user_handler = functools.partial(handle_message, client=user_client, bot=bot_app.bot)
     user_client.on(events.NewMessage())(user_handler)
 
     # 5. Start clients and run concurrently

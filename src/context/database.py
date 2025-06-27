@@ -89,4 +89,13 @@ async def get_completed_tasks(from_date: Optional[str] = None, to_date: Optional
     cursor.execute(query, params)
     tasks = cursor.fetchall()
     conn.close()
-    return [dict(task) for task in tasks] 
+    return [dict(task) for task in tasks]
+
+async def get_task_by_id(task_id: int):
+    """Retrieves a single task by its id."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM tasks WHERE id = ?", (task_id,))
+    task = cursor.fetchone()
+    conn.close()
+    return dict(task) if task else None 

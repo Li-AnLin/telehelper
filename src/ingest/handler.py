@@ -1,6 +1,8 @@
 from telethon import events, TelegramClient
 from telethon.tl.types import User
 import datetime
+import re
+from telegram import Bot
 
 from src import config
 from src.llm import client as llm_client
@@ -69,7 +71,7 @@ async def create_task_from_event(event, sender_name: str):
     return task_id
 
 # This function will be registered as the event handler
-async def handle_message(event: events.NewMessage.Event, client: TelegramClient):
+async def handle_message(event: events.NewMessage.Event, client: TelegramClient, bot: Bot):
     """The main message handler."""
     chat = await event.get_chat()
     me = await client.get_me()
@@ -104,7 +106,18 @@ async def handle_message(event: events.NewMessage.Event, client: TelegramClient)
     # Ignore messages sent by myself
     if getattr(sender, 'id', None) == getattr(me, 'id', None):
         print("Ignoring message sent by myself.")
-        return
+        # 新增：自動處理 /done 指令
+        match = re.match(r"/done\\s+(\\d+)", text.strip())
+        if match and bot:
+            task_id = int(match.group(1))
+            task = await database.get_task_by_id(task_id)
+            if task:
+                await database.update_task_status(task_id, "done")
+                await bot.send_message(chat_id=sender.id, text=f"✅ 任務 {task_id} 已標記為完成！")
+                print(f"Task {task_id} marked as done by myself via /done command.")
+            else:
+                await bot.send_message(chat_id=sender.id, text=f"找不到任務 {task_id}，請確認編號是否正確。")
+            return
 
     sender_name = get_sender_name(sender)
     
