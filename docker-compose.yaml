@@ -1,0 +1,10 @@
+services:
+  telehelper:
+    image: zaizai/telehelper:latest
+    container_name: telehelper
+    restart: always
+    volumes:
+      - ./tasks.db:/app/tasks.db
+      - ./config.yaml:/app/config.yaml
+    environment:
+      USER_SESSION_STRING: ${USER_SESSION_STRING}
