@@ -53,7 +53,7 @@ def get_sender_name(sender):
     return "Unknown"
 
 async def create_task_from_event(event, sender_name: str):
-    """Creates a task dictionary from a message event."""
+    """Creates a task dictionary from a message event and returns the task id."""
     task_data = {
         'source': 'telegram',
         'chat_id': event.chat_id,
@@ -65,7 +65,8 @@ async def create_task_from_event(event, sender_name: str):
         'status': 'new',
         'tags': []
     }
-    await database.add_task(task_data)
+    task_id = await database.add_task(task_data)
+    return task_id
 
 # This function will be registered as the event handler
 async def handle_message(event: events.NewMessage.Event, client: TelegramClient):
@@ -119,9 +120,9 @@ async def handle_message(event: events.NewMessage.Event, client: TelegramClient)
 
     if should_process:
         print(f"Detected potential task from {sender_name} in chat {event.chat_id}.")
-        await create_task_from_event(event, sender_name)
+        task_id = await create_task_from_event(event, sender_name)
         # Optionally, send a confirmation reply
         if config.ENABLE_REPLY_IN_PRIVATE and event.is_private:
-            await event.reply(config.TASK_ADDED_REPLY) 
+            await event.reply(f"{config.TASK_ADDED_REPLY}\n({task_id})")
         elif config.ENABLE_REPLY and not event.is_private:
-            await event.reply(config.TASK_ADDED_REPLY) 
+            await event.reply(f"{config.TASK_ADDED_REPLY}\n({task_id})") 

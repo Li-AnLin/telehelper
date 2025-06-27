@@ -31,7 +31,7 @@ def init_db():
     print("Database initialized.")
 
 async def add_task(task_data: dict):
-    """Adds a new task to the database."""
+    """Adds a new task to the database and returns the inserted task's id."""
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("""
@@ -48,9 +48,11 @@ async def add_task(task_data: dict):
         task_data.get('status', 'new'),
         ",".join(task_data.get('tags', []))
     ))
+    task_id = cursor.lastrowid
     conn.commit()
     conn.close()
-    print(f"Task added from chat {task_data.get('chat_id')}")
+    print(f"Task added from chat {task_data.get('chat_id')}, id={task_id}")
+    return task_id
 
 async def get_pending_tasks():
     """Retrieves all tasks that are not marked as 'done'."""
