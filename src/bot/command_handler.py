@@ -56,7 +56,7 @@ async def tasks_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
             message += f"{i}. (ID: {task['id']}) {status_icon} [{chat_info}] {task['content'][:50]}...\n"
         
         message += "\n使用 `/done <任務編號>` 來標記完成。"
-        await update.message.reply_text(message, parse_mode='MarkdownV2')
+        await update.message.reply_text(message, parse_mode='Markdown')
         print(f"Sent pending tasks list with {len(pending_tasks)} tasks.")
 
     except Exception as e:
@@ -128,14 +128,14 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     help_message = (
         "👋 我是您的 AI Telegram 小助手！\n\n"
         "我能幫助您管理任務和提供每日摘要。以下是您可以使用的指令：\n\n"
-        "`/tasks` \\- 顯示所有未處理的任務。\n"
-        "`/completed` \\- 顯示所有已完成的任務。\n"
-        "`/completed today` \\- 顯示今天完成的任務。\n"
-        "`/completed yesterday` \\- 顯示昨天完成的任務。\n"
-        "`/done <任務編號>` \\- 標記指定編號的任務為完成。\n\n"
+        "`/tasks` - 顯示所有未處理的任務。\n"
+        "`/completed` - 顯示所有已完成的任務。\n"
+        "`/completed today` - 顯示今天完成的任務。\n"
+        "`/completed yesterday` - 顯示昨天完成的任務。\n"
+        "`/done <任務編號>` - 標記指定編號的任務為完成。\n\n"
         "我還會自動記錄您在群組中標記我 ( @您的使用者名稱 ) 或私訊我的任務喔！"
     )
-    await update.message.reply_text(help_message, parse_mode='MarkdownV2')
+    await update.message.reply_text(help_message, parse_mode='Markdown')
     print("Sent help message.")
 
 async def unknown_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

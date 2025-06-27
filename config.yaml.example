@@ -18,11 +18,13 @@ bot_settings:
   telegram_user_name: Boss # how you want the bot to address you
   # Message to reply when a task is added
   task_added_reply: Note it.
+  enable_reply: true
 
 # Scheduler settings
 scheduler:
   # CRON expression for daily summary, default is 9:00 AM daily
-  daily_summary_cron: "0 9 * * *"
+  # (m) (h) (D) (M) (W)
+  daily_summary_cron: "0 9 * * * 1-5"
 
 # Notifier bot settings
 notifier:

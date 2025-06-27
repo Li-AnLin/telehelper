@@ -121,4 +121,5 @@ async def handle_message(event: events.NewMessage.Event, client: TelegramClient)
         print(f"Detected potential task from {sender_name} in chat {event.chat_id}.")
         await create_task_from_event(event, sender_name)
         # Optionally, send a confirmation reply
-        await event.reply(config.TASK_ADDED_REPLY) 
+        if config.ENABLE_REPLY:
+            await event.reply(config.TASK_ADDED_REPLY) 
