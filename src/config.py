@@ -32,6 +32,7 @@ bot_settings_config = config.get("bot_settings", {})
 IGNORE_GROUPS = bot_settings_config.get("ignore_groups", [])
 TELEGRAM_USER_NAME = bot_settings_config.get("telegram_user_name", "Boss")
 ENABLE_REPLY = bot_settings_config.get("enable_reply", True)
+ENABLE_REPLY_IN_PRIVATE = bot_settings_config.get("enable_reply_in_private", True)
 TASK_ADDED_REPLY = bot_settings_config.get("task_added_reply", "Note it.")
 
 # --- Scheduler Settings ---

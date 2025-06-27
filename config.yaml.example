@@ -19,6 +19,7 @@ bot_settings:
   # Message to reply when a task is added
   task_added_reply: Note it.
   enable_reply: true
+  enable_reply_in_private: true
 
 # Scheduler settings
 scheduler:
